@@ -86,7 +86,15 @@ gráfico_formas_pagamento = px.pie(data_frame=formas_pagamento, names='forma_pag
 vendas = df['valor'].sum()
 vendas_legivel = f"R$ {ajuste_ordem(vendas, ',', '.')}"
 
-aba1, aba2 = st.tabs(['Receita', 'Vendas'])
+vendas_por_hora = df['hora'].value_counts().reset_index()
+horario_pico = vendas_por_hora['hora'][0]
+frequencia_pico = vendas_por_hora['count'][0]
+grafico_horario_vendas = px.bar(data_frame=vendas_por_hora, x=vendas_por_hora['hora'], y=vendas_por_hora['count'],
+                                color_discrete_sequence=paleta,
+                                labels={'hora': 'Horário', 'count': 'Quantidade de vendas'},
+                                title='Distribuição das vendas por momento do dia')
+
+aba1, aba2 = st.tabs(['Visão geral', 'Vendas'])
 
 with aba1:
     coluna1, coluna2 = st.columns(2)
@@ -100,7 +108,17 @@ with aba1:
     ' da receita** utilizada pelo estabelecimento comercial. Exploraremos a questão da aparente baixa perfomance' \
     ' chocolate quente mais à frente.')
     st.plotly_chart(gráfico_formas_pagamento, use_container_width=True)
+    st.markdown('A forma de pagamento mais frequentemente utilizada foi o **cartão**. Isso revela que mecanismos' \
+    ' de incentivo financeiro ─ a exemplo de **ausência de juros** ou **oferecimento de cashback** por meio de convênio' \
+    ' com outras instituições ─ podem ser empregados objetivando a diminuição do custo final da compra através dele.')
 
 with aba2:
     coluna1, coluna2 = st.columns(2)
+    with coluna1:
+        st.metric('Número de vendas', df.shape[0])
+    with coluna2:
+        st.metric('Horário de pico:', f'{horario_pico} horas')
+    st.markdown('A hora do dia que correspondia à maior fatia da quantidade de vendas no estabelecimento eram as **10 da manhã**,' \
+    f' com **{frequencia_pico} compras** feitas nesse momento do dia.')
+    st.plotly_chart(grafico_horario_vendas, use_container_width=True)
     st.dataframe(df)
