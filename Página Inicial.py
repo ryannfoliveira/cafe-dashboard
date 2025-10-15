@@ -90,7 +90,7 @@ vendas_por_hora = df['hora'].value_counts().reset_index()
 horario_pico = vendas_por_hora['hora'][0]
 frequencia_pico = vendas_por_hora['count'][0]
 grafico_horario_vendas = px.bar(data_frame=vendas_por_hora, x=vendas_por_hora['hora'], y=vendas_por_hora['count'],
-                                color_discrete_sequence=paleta,
+                                color=vendas_por_hora['count'], color_continuous_scale=paleta,
                                 labels={'hora': 'Horário', 'count': 'Quantidade de vendas'},
                                 title='Distribuição das vendas por momento do dia')
 
