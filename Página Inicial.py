@@ -94,6 +94,25 @@ grafico_horario_vendas = px.bar(data_frame=vendas_por_hora, x=vendas_por_hora['h
                                 labels={'hora': 'Horário', 'count': 'Quantidade de vendas'},
                                 title='Distribuição das vendas por momento do dia')
 
+ordem_dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+df['dia_semana'] = pd.Categorical(df['dia_semana'], categories=ordem_dias, ordered=True)
+vendas_por_dia = df['dia_semana'].value_counts().reset_index()
+vendas_por_dia = vendas_por_dia.sort_values('dia_semana')
+grafico_vendas_semana = px.line(data_frame=vendas_por_dia, x=vendas_por_dia['dia_semana'], y=vendas_por_dia['count'],
+                                markers=True, labels={'dia_semana': 'Dia da semana', 'count': 'Quantidade de vendas'},
+                                title='Distribuição das vendas ao longo dos dias da semana')
+
+ordem_meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+df['mes'] = pd.Categorical(df['mes'], categories=ordem_meses, ordered=True)
+vendas_por_mes = df['mes'].value_counts().reset_index()
+vendas_por_mes = vendas_por_mes.sort_values('mes')
+grafico_vendas_ano = px.bar(data_frame=vendas_por_mes, x=vendas_por_mes['mes'], y=vendas_por_mes['count'],
+                            color=vendas_por_mes['count'], color_continuous_scale=paleta,
+                            labels={'mes': 'Mês', 'count': 'Quantidade de vendas'},
+                            title='Distribuição das vendas ao longo do ano')
+grafico_vendas_semana.update_traces(line={'color': '#7B4A2F'})
+grafico_vendas_semana.update_yaxes(range=[349, 600])
+
 aba1, aba2 = st.tabs(['Visão geral', 'Vendas'])
 
 with aba1:
@@ -121,4 +140,9 @@ with aba2:
     st.markdown('A hora do dia que correspondia à maior fatia da quantidade de vendas no estabelecimento eram as **10 da manhã**,' \
     f' com **{frequencia_pico} compras** feitas nesse momento do dia.')
     st.plotly_chart(grafico_horario_vendas, use_container_width=True)
-    st.dataframe(df)
+    st.plotly_chart(grafico_vendas_semana, use_container_width=True)
+    st.plotly_chart(grafico_vendas_ano, use_container_width=True)
+    st.markdown('É nítida uma curva formando uma concavidade durante os meses correspondentes ao verão (hemisfério norte). Isso é' \
+    ' explicável pelo fato de não ser atrativo ao cliente comprar bebidas e alimentos quentes durante períodos de calor constante, e é' \
+    ' algo normal e esperado para cafeterias. Contudo, pode ser contornado através da introdução de um cardápio sazonal (rotativo),' \
+    ' bem como de eventos e/ou descontos de tempo limitado, visando manter um fluxo constante de caixa durante qualquer época do ano.')
