@@ -146,3 +146,13 @@ with aba2:
     ' explicável pelo fato de não ser atrativo ao cliente comprar bebidas e alimentos quentes durante períodos de calor constante, e é' \
     ' algo normal e esperado para cafeterias. Contudo, pode ser contornado através da introdução de um cardápio sazonal (rotativo),' \
     ' bem como de eventos e/ou descontos de tempo limitado, visando manter um fluxo constante de caixa durante qualquer época do ano.')
+
+with st.sidebar:
+    st.title('Detalhamentos')
+    with st.expander(''):
+        st.write('As vendas registradas abrangem um período superior a um ano, iniciando-se em 01/03/2024 e finalizando em 23/03/2025. São' \
+        ' comercializados 8 produtos e utilizados 3 métodos de pagamento pela clientela.')
+    st.subheader('Disclaimer')
+    with st.expander(''):
+        st.write('> *Os dados utilizados nesse dashboard provêm do dataset* [***Coffee Sales Trends Data***](https://www.kaggle.com/datasets/ayeshaimran123/coffee-sales-trends-data)*, que está' \
+        ' sob licença de domínio público, sendo-me, portanto, permitida a sua utilização, sem menção do texto da licença, inclusive.*')
