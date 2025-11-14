@@ -1,5 +1,15 @@
 import streamlit as st
 import pandas as pd
+import time
+
+@st.cache_data
+def converter_csv(df):
+    return df.to_csv(index=False).encode('utf-8')
+
+def mensagem_sucesso():
+    sucesso = st.success('Arquivo baixado com sucesso', icon = '✅')
+    time.sleep(5)
+    sucesso.empty()
 
 df = pd.read_csv('base_vendas.csv')
 
@@ -29,3 +39,17 @@ dados_filtrados = df[
 
 st.dataframe(dados_filtrados)
 st.markdown(f'Há :green[{dados_filtrados.shape[0]}] linhas e :green[{dados_filtrados.shape[1]}] colunas.')
+
+st.markdown('' \
+'---' \
+'')
+
+st.markdown('##### Salvar arquivo como:')
+coluna1, coluna2 = st.columns(2)
+with coluna1:
+    nome_arquivo = st.text_input('', label_visibility='collapsed', placeholder='Nome do arquivo', max_chars=100)
+    nome_arquivo += '.csv'
+with coluna2:
+    st.download_button('Download (.csv)', data = converter_csv(dados_filtrados), file_name=nome_arquivo, mime='text/csv', on_click=mensagem_sucesso)
+if nome_arquivo != '.csv':
+    st.markdown(f'O arquivo será salvo como "{nome_arquivo}"')
