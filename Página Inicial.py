@@ -67,18 +67,30 @@ st.title('DASHBOARD')
 
 df = pd.read_csv('base_vendas.csv')
 df['nome_cafe'] = df['nome_cafe'].apply(lambda x: x.replace('Hot Chocolate', 'Chocolate Quente').replace('Americano with Milk', 'Americano com leite').replace('Cocoa', 'Achocolatado'))
-mais_vendido = pd.DataFrame(df.nome_cafe.value_counts().reset_index().iloc[0]).T.reset_index(drop=True)
 
+# Criando os "pódios" das categorias
+mais_vendido = pd.DataFrame(df.nome_cafe.value_counts().reset_index().iloc[0]).T.reset_index(drop=True)
 cafes = df['nome_cafe'].value_counts().reset_index()
+formas_pagamento = df['forma_pagamento'].value_counts().reset_index()
+vendas_por_dia = df['dia_semana'].value_counts().reset_index()
+vendas_por_dia = vendas_por_dia.sort_values('dia_semana')
+vendas_por_hora = df['hora'].value_counts().reset_index()
+horario_pico = vendas_por_hora['hora'][0]
+frequencia_pico = vendas_por_hora['count'][0]
+vendas_por_mes = df['mes'].value_counts().reset_index()
+vendas_por_mes = vendas_por_mes.sort_values('mes')
+
+# Ajustes estéticos: criando a paleta (imitando um caffè latte) e setando o tema
 paleta = ['#FBE9D0', '#EDD0B0', '#D6A77A', '#BC8A65', '#9C6A4A', '#7B4A2F', '#5A2E1A', '#381C0B']
 pio.templates.default = 'presentation'
+
+# Criando os gráficos
 grafico_cafes_populares = px.bar(data_frame=cafes, x=cafes['nome_cafe'],
                                  y=cafes['count'], color='count',
                                  color_continuous_scale=paleta,
                                  labels={'nome_cafe': 'Nome do café', 'count': 'Quantidade de vendas'},
                                  title='Cafés em ordem de popularidade')
 
-formas_pagamento = df['forma_pagamento'].value_counts().reset_index()
 gráfico_formas_pagamento = px.pie(data_frame=formas_pagamento, names='forma_pagamento',
                                   values='count', title='Distribuição das Formas de Pagamento',
                                   color_discrete_sequence=['#381C0B', '#5A2E1A', '#7B4A2F'])
@@ -86,26 +98,21 @@ gráfico_formas_pagamento = px.pie(data_frame=formas_pagamento, names='forma_pag
 vendas = df['valor'].sum()
 vendas_legivel = f"R$ {ajuste_ordem(vendas, ',', '.')}"
 
-vendas_por_hora = df['hora'].value_counts().reset_index()
-horario_pico = vendas_por_hora['hora'][0]
-frequencia_pico = vendas_por_hora['count'][0]
 grafico_horario_vendas = px.bar(data_frame=vendas_por_hora, x=vendas_por_hora['hora'], y=vendas_por_hora['count'],
                                 color=vendas_por_hora['count'], color_continuous_scale=paleta,
                                 labels={'hora': 'Horário', 'count': 'Quantidade de vendas'},
                                 title='Distribuição das vendas por momento do dia')
 
+# Definindo a ordem dos dias e dos meses para que o gráfico não fique completamente errado
 ordem_dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
 df['dia_semana'] = pd.Categorical(df['dia_semana'], categories=ordem_dias, ordered=True)
-vendas_por_dia = df['dia_semana'].value_counts().reset_index()
-vendas_por_dia = vendas_por_dia.sort_values('dia_semana')
+ordem_meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+df['mes'] = pd.Categorical(df['mes'], categories=ordem_meses, ordered=True)
+
 grafico_vendas_semana = px.line(data_frame=vendas_por_dia, x=vendas_por_dia['dia_semana'], y=vendas_por_dia['count'],
                                 markers=True, labels={'dia_semana': 'Dia da semana', 'count': 'Quantidade de vendas'},
                                 title='Distribuição das vendas ao longo dos dias da semana')
 
-ordem_meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-df['mes'] = pd.Categorical(df['mes'], categories=ordem_meses, ordered=True)
-vendas_por_mes = df['mes'].value_counts().reset_index()
-vendas_por_mes = vendas_por_mes.sort_values('mes')
 grafico_vendas_ano = px.bar(data_frame=vendas_por_mes, x=vendas_por_mes['mes'], y=vendas_por_mes['count'],
                             color=vendas_por_mes['count'], color_continuous_scale=paleta,
                             labels={'mes': 'Mês', 'count': 'Quantidade de vendas'},
