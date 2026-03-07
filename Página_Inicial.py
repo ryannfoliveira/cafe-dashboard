@@ -68,6 +68,12 @@ st.title('DASHBOARD')
 df = pd.read_csv('base_vendas.csv')
 df['nome_cafe'] = df['nome_cafe'].apply(lambda x: x.replace('Hot Chocolate', 'Chocolate Quente').replace('Americano with Milk', 'Americano com leite').replace('Cocoa', 'Achocolatado'))
 
+# Definindo a ordem dos dias e dos meses para que o gráfico não fique completamente errado
+ordem_dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+df['dia_semana'] = pd.Categorical(df['dia_semana'], categories=ordem_dias, ordered=True)
+ordem_meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+df['mes'] = pd.Categorical(df['mes'], categories=ordem_meses, ordered=True)
+
 # Criando os "pódios" das categorias
 mais_vendido = pd.DataFrame(df.nome_cafe.value_counts().reset_index().iloc[0]).T.reset_index(drop=True)
 cafes = df['nome_cafe'].value_counts().reset_index()
@@ -102,12 +108,6 @@ grafico_horario_vendas = px.bar(data_frame=vendas_por_hora, x=vendas_por_hora['h
                                 color=vendas_por_hora['count'], color_continuous_scale=paleta,
                                 labels={'hora': 'Horário', 'count': 'Quantidade de vendas'},
                                 title='Distribuição das vendas por momento do dia')
-
-# Definindo a ordem dos dias e dos meses para que o gráfico não fique completamente errado
-ordem_dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
-df['dia_semana'] = pd.Categorical(df['dia_semana'], categories=ordem_dias, ordered=True)
-ordem_meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-df['mes'] = pd.Categorical(df['mes'], categories=ordem_meses, ordered=True)
 
 grafico_vendas_semana = px.line(data_frame=vendas_por_dia, x=vendas_por_dia['dia_semana'], y=vendas_por_dia['count'],
                                 markers=True, labels={'dia_semana': 'Dia da semana', 'count': 'Quantidade de vendas'},
@@ -157,8 +157,8 @@ with aba2:
 with st.sidebar:
     st.title('Detalhamentos')
     with st.expander(''):
-        st.write('As vendas registradas abrangem um período superior a um ano, iniciando-se em 01/03/2024 e finalizando em 23/03/2025. São' \
-        ' comercializados 8 produtos e utilizados 3 métodos de pagamento pela clientela.')
+        st.write('> *As vendas registradas abrangem um período superior a um ano, iniciando-se em 01.03.2024 e finalizando em 23.03.2025. São' \
+        ' comercializados 8 produtos e utilizados 3 métodos de pagamento pela clientela.*')
     st.subheader('Disclaimer')
     with st.expander(''):
         st.write('> *Os dados utilizados nesse dashboard provêm do dataset* [***Coffee Sales Trends Data***](https://www.kaggle.com/datasets/ayeshaimran123/coffee-sales-trends-data)*, que está' \
